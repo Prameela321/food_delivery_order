@@ -49,7 +49,7 @@ Endpoints:
 Data Models:
     Users : schema of the User
 
-       Fields:
+       Fields:{
              userName : {
                 type : String,
                 required : true
@@ -60,6 +60,7 @@ Data Models:
             },
             address : String,
             password : String
+        }
 
         Example :
             {
@@ -72,6 +73,7 @@ Data Models:
     
     Restaurants : schema of the restaurant
          Fields : 
+                    {
                     displayName : String,
                     imgId : String,
                     avgRating : String,
@@ -79,6 +81,7 @@ Data Models:
                     cuisines : String,
                     location : String,
                     offerLine : String
+                    }
         Example:
                  {
                      "_id":{"$oid":"673efa2b4fedf56669c0da74"},
@@ -95,6 +98,7 @@ Data Models:
     MenuItems : Schema of the menuItems
 
            Fields:
+           {
                 restaurantId : mongoose.Types.ObjectId,
                 name : String,
                 price : Number,
@@ -102,6 +106,7 @@ Data Models:
                 netprice : Number,
                 description : String,
                 Rating : Number
+            }
 
            Example :
                {
@@ -117,7 +122,8 @@ Data Models:
 
     orders:  Schema of the Orders
            Fields : 
-                     userId : mongoose.Types.ObjectId,
+                  {
+                    userId : mongoose.Types.ObjectId,
                     shipName : String,
                     deliveryAddress : String,
                     menuList : Array,
@@ -126,6 +132,7 @@ Data Models:
                         enum : ['ORDERED','PROCESSED','DELIVERED','CANCELLED'],
                         default : 'ORDERED'
                     }
+                }
             Example :
                {
                "_id":{"$oid":"67836eba480a0e622515d68f"},
