@@ -60,42 +60,39 @@ const listOrders  = async (req,res)=>{
 const cancelOrderByEmailAndOrderId = async (req,res) =>{
     const {email,orderId} = req.body;
     try{
-        const userRecord = await userModel.find({email})
-        const orderRecord = await orderModel.find({
-            $and :[
-                    {"userId" : { $eq : userRecord._id} },
-                    {"_id" : {$eq : orderId}}
-                 ]
-         });
-        if(!orderRecord){
-            return res.status(404).json({"error" : `OrderId or Email  is incorrect`})
+        const userRecord = await userModel.findOne({email});
+        console.log([ { userId : userRecord._id}, {_id: orderId }],"test");
+        const updated =  await orderModel.findOneAndUpdate( 
+            { $and: [ { userId : userRecord._id}, {_id: orderId }] },
+            { $set: { status : 'CANCELLED' }},
+            { new: true }
+        )
+
+        if(!updated){
+          return  res.status(400).json({"error" : "Record Not found"})
         }
-        console.log(orderRecord,"order");
-        const updated =  await userModel.findByIdAndUpdate(orderId,{"status" : 'CANCELLED'},{new:true,runValidators: true})
-        res.status(200).json(updated);
+        return res.status(200).json(updated);
+        
     }catch(err){
-        res.status(500).json({"error" : err.message});
+        return res.status(500).json({"error" : err.message});
     }
 }
 
 const updateOrderByEmailAndOrderId = async (req,res) =>{
-    const {email,orderId,newAddress} = req.body;
-    // console.log("test");
+    const {email,orderId,deliveryAddress} = req.body;
+    console.log("test",req.body);
     try{
-        const userRecord = await userModel.find({email})
-        // const filter = {
-        //    $and : [ 
-        //     {"userId" :  userRecord._id } ,
-        //     {"_id" :  orderId}
-        //    ]
-        // };
+        const userRecord = await userModel.findOne({email});
        
-        // const updatefield = {"deliveryAddress" : newAddress};
         const updated = await orderModel.findOneAndUpdate(
-            { userId: userRecord._id, _id : orderId },
-            { deliveryAddress: newAddress},
-            { returnOriginal : false }
+            { $and: [ { userId : userRecord._id}, {_id: orderId }] },
+            { $set: { deliveryAddress: deliveryAddress }},
+            { new: true }
         );
+        if(!updated){
+            res.status(400).json({"error" : "Record Not found"})
+        }
+       
        res.status(200).json(updated);
     }catch(err){
         res.status(500).json({"error" : err.message});
