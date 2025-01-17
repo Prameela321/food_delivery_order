@@ -40,10 +40,10 @@ Endpoints:
               end point : GET/listOrders
               description : to get the list of active orders
            4.cancelOrderByEmailAndOrderId:
-              end point :PUT/cancelOrderByEmailAndOrderId
+              end point :PATCH/cancelOrderByEmailAndOrderId
               description : to cancel the order by email and orderid
            5.updateOrderByEmailAndOrderId :
-              end point :PUT/createUser
+              end point :PATCH/createUser
               description : to update the existing address by email and orderid
 
 Data Models:
