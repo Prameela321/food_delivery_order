@@ -1,5 +1,8 @@
 const orderModel = require('../models/ordersModel');
 const userModel = require('../models/userModel');
+const cache = require('node-cache');
+
+const nodeCache = new cache();
 
 const createOrder = async (req,res)=>{
     const  {shipName,email,deliveryAddress,menuList} = req.body;
@@ -45,12 +48,44 @@ const getOrdersByEmail  = async (req,res)=>{
 
 }
 const listOrders  = async (req,res)=>{
+   
+    let data ;
     try{ 
-        const data = await orderModel.find({ "status" : {$ne : "CANCELLED"} }).sort({"_id":-1});
+       
+        if(!nodeCache.has('orders')){
+            const aggregateObj = [
+                {
+                    $lookup: {
+                        from : 'menuitems',
+                        localField : "menuList",
+                        foreignField : "_id",
+                        as : "menuData"
+                    }
+                }
+                ,
+                {
+                    $unwind : "$menuData"
+                },
+                {
+                    $lookup : {
+                    from : "customers",
+                    localField : "userId",
+                    foreignField : "_id",
+                    as : "userData"
+                    }
+                },
+                
+            ];
+            data =  await orderModel.aggregate(aggregateObj)
+            nodeCache.set('orders',JSON.stringify(data));
+        }else{
+            data = JSON.parse(nodeCache.get('orders'));
+        }
+            
         if(!data){
             return res.status(400).find({"error" : "No Data Found"});
         }
-        res.status(200).json(data);
+            res.status(200).json(data);
     }catch(err){
         return res.status(500).json({"error" : err.message});
     }
